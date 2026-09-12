@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Hub - Ludo</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #080b16;
+  color: white;
+  text-align: center;
+}
+
+h1 {
+  margin: 18px 0 5px;
+}
+
+#turn {
+  margin: 10px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.board {
+  width: min(94vw, 520px);
+  height: min(94vw, 520px);
+  margin: 15px auto;
+  display: grid;
+  grid-template-columns: repeat(15, 1fr);
+  grid-template-rows: repeat(15, 1fr);
+  background: white;
+  border: 5px solid #222;
+}
+
+.cell {
+  border: 1px solid #bbb;
+  position: relative;
+  background: #fff;
+}
+
+.red {
+  background: #ef4444;
+}
+
+.green {
+  background: #22c55e;
+}
+
+.yellow {
+  background: #facc15;
+}
+
+.blue {
+  background: #3b82f6;
+}
+
+.center {
+  background: linear-gradient(45deg,
+    #ef4444 0 25%,
+    #22c55e 25% 50%,
+    #facc15 50% 75%,
+    #3b82f6 75%);
+}
+
+.piece {
+  width: 75%;
+  height: 75%;
+  border-radius: 50%;
+  position: absolute;
+  top: 12%;
+  left: 12%;
+  border: 3px solid white;
+  box-shadow: 0 2px 5px #333;
+}
+
+.red-piece {
+  background: #dc2626;
+}
+
+.green-piece {
+  background: #16a34a;
+}
+
+.yellow-piece {
+  background: #eab308;
+}
+
+.blue-piece {
+  background: #2563eb;
+}
+
+.controls {
+  margin: 15px auto;
+  padding: 15px;
+}
+
+#dice {
+  font-size: 55px;
+  margin: 10px;
+}
+
+button {
+  border: none;
+  padding: 13px 25px;
+  border-radius: 12px;
+  background: #6c63ff;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:active {
+  transform: scale(.95);
+}
+
+#message {
+  margin: 10px;
+  color: #cbd5e1;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🎲 LUDO</h1>
+
+<div id="turn">Red Player की बारी</div>
+
+<div class="board" id="board"></div>
+
+<div class="controls">
+
+  <div id="dice">🎲</div>
+
+  <button onclick="rollDice()">
+    ROLL DICE
+  </button>
+
+  <div id="message">
+    पासा फेंककर खेल शुरू करें!
+  </div>
+
+</div>
+
+<script>
+
+const board = document.getElementById("board");
+
+const players = [
+  {
+    name: "Red",
+    color: "red-piece"
+  },
+  {
+    name: "Green",
+    color: "green-piece"
+  },
+  {
+    name: "Yellow",
+    color: "yellow-piece"
+  },
+  {
+    name: "Blue",
+    color: "blue
