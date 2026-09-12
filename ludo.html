@@ -9,62 +9,101 @@
 *{box-sizing:border-box}
 
 body{
-  margin:0;
-  background:#080b16;
-  color:white;
-  font-family:Arial,sans-serif;
-  text-align:center;
+ margin:0;
+ background:#070a13;
+ color:white;
+ font-family:Arial,sans-serif;
+ text-align:center;
 }
 
-h1{margin:15px 0 5px}
+h1{
+ margin:15px 0 5px;
+}
 
 #turn{
-  font-size:20px;
-  font-weight:bold;
-  margin:10px;
+ font-size:20px;
+ font-weight:bold;
+ margin:10px;
+}
+
+.info{
+ display:flex;
+ justify-content:center;
+ flex-wrap:wrap;
+ gap:8px;
+ margin:8px;
+}
+
+.info div{
+ padding:7px 12px;
+ border-radius:10px;
+ background:#151a2b;
 }
 
 .board{
-  width:min(94vw,520px);
-  height:min(94vw,520px);
-  margin:15px auto;
-  display:grid;
-  grid-template-columns:repeat(15,1fr);
-  grid-template-rows:repeat(15,1fr);
-  background:white;
-  border:5px solid #222;
+ width:min(95vw,540px);
+ aspect-ratio:1;
+ margin:15px auto;
+ display:grid;
+ grid-template-columns:repeat(15,1fr);
+ grid-template-rows:repeat(15,1fr);
+ border:5px solid #202020;
+ background:white;
 }
 
 .cell{
-  position:relative;
-  border:1px solid #aaa;
-  background:white;
+ position:relative;
+ border:1px solid #aaa;
+ background:#fff;
 }
 
-.red{background:#ef4444}
-.green{background:#22c55e}
-.yellow{background:#facc15}
-.blue{background:#3b82f6}
+.redArea{background:#ef4444}
+.greenArea{background:#22c55e}
+.yellowArea{background:#facc15}
+.blueArea{background:#3b82f6}
+
+.path{
+ background:#fff;
+}
+
+.redPath{background:#fecaca}
+.greenPath{background:#bbf7d0}
+.yellowPath{background:#fef08a}
+.bluePath{background:#bfdbfe}
+
+.safe{
+ background:#ddd;
+}
 
 .center{
-  background:linear-gradient(
-    45deg,
-    #ef4444 0 25%,
-    #22c55e 25% 50%,
-    #facc15 50% 75%,
-    #3b82f6 75%
-  );
+ background:conic-gradient(
+   #22c55e 0 25%,
+   #facc15 25% 50%,
+   #3b82f6 50% 75%,
+   #ef4444 75% 100%
+ );
+}
+
+.homeDot{
+ width:60%;
+ height:60%;
+ border-radius:50%;
+ position:absolute;
+ top:20%;
+ left:20%;
+ background:white;
+ box-shadow:inset 0 0 0 3px #555;
 }
 
 .piece{
-  width:42%;
-  height:42%;
-  border-radius:50%;
-  position:absolute;
-  border:2px solid white;
-  box-shadow:0 2px 5px #333;
-  cursor:pointer;
-  z-index:5;
+ width:42%;
+ height:42%;
+ position:absolute;
+ border-radius:50%;
+ border:2px solid white;
+ box-shadow:0 2px 5px #333;
+ cursor:pointer;
+ z-index:10;
 }
 
 .red-piece{background:#dc2626}
@@ -73,46 +112,37 @@ h1{margin:15px 0 5px}
 .blue-piece{background:#2563eb}
 
 .controls{
-  padding:10px;
+ margin:10px;
 }
 
 #dice{
-  font-size:55px;
-  margin:8px;
+ font-size:55px;
+ margin:8px;
 }
 
 button{
-  padding:13px 25px;
-  border:0;
-  border-radius:12px;
-  background:#6c63ff;
-  color:white;
-  font-size:17px;
-  font-weight:bold;
-  cursor:pointer;
+ border:0;
+ border-radius:12px;
+ padding:13px 25px;
+ background:#6c63ff;
+ color:white;
+ font-size:17px;
+ font-weight:bold;
+ cursor:pointer;
 }
 
 button:active{
-  transform:scale(.95);
+ transform:scale(.95);
 }
 
 #message{
-  margin:12px;
-  color:#cbd5e1;
+ margin:12px;
+ color:#cbd5e1;
 }
 
-.player-info{
-  display:flex;
-  justify-content:center;
-  flex-wrap:wrap;
-  gap:8px;
-  padding:5px 10px;
-}
-
-.player-info div{
-  padding:7px 12px;
-  border-radius:10px;
-  font-size:13px;
+#restart{
+ margin-top:5px;
+ background:#242b43;
 }
 </style>
 </head>
@@ -123,276 +153,516 @@ button:active{
 
 <div id="turn">🔴 Red Player की बारी</div>
 
-<div class="player-info">
-  <div>🔴 Red: <span id="redHome">4</span></div>
-  <div>🟢 Green: <span id="greenHome">4</span></div>
-  <div>🟡 Yellow: <span id="yellowHome">4</span></div>
-  <div>🔵 Blue: <span id="blueHome">4</span></div>
+<div class="info">
+ <div>🔴 Red: <b id="r">0</b>/4</div>
+ <div>🟢 Green: <b id="g">0</b>/4</div>
+ <div>🟡 Yellow: <b id="y">0</b>/4</div>
+ <div>🔵 Blue: <b id="b">0</b>/4</div>
 </div>
 
 <div class="board" id="board"></div>
 
 <div class="controls">
-  <div id="dice">🎲</div>
 
-  <button onclick="rollDice()">ROLL DICE</button>
+ <div id="dice">🎲</div>
 
-  <div id="message">
-    पहले पासा फेंकें।
-  </div>
+ <button onclick="rollDice()">ROLL DICE</button>
+
+ <br><br>
+
+ <button id="restart" onclick="location.reload()">
+   🔄 Restart Game
+ </button>
+
+ <div id="message">
+   पहले Dice Roll करें।
+ </div>
+
 </div>
 
 <script>
 
-const board=document.getElementById("board");
+/* =========================
+   PLAYERS
+========================= */
 
 const players=[
-  {
-    name:"Red",
-    emoji:"🔴",
-    color:"red-piece",
-    home:[16,17,31,32]
-  },
-  {
-    name:"Green",
-    emoji:"🟢",
-    color:"green-piece",
-    home:[18,19,33,34]
-  },
-  {
-    name:"Yellow",
-    emoji:"🟡",
-    color:"yellow-piece",
-    home:[190,191,205,206]
-  },
-  {
-    name:"Blue",
-    emoji:"🔵",
-    color:"blue-piece",
-    home:[192,193,207,208]
-  }
+ {
+  name:"Red",
+  emoji:"🔴",
+  cls:"red-piece",
+  start:0,
+  area:"redArea"
+ },
+ {
+  name:"Green",
+  emoji:"🟢",
+  cls:"green-piece",
+  start:13,
+  area:"greenArea"
+ },
+ {
+  name:"Yellow",
+  emoji:"🟡",
+  cls:"yellow-piece",
+  start:26,
+  area:"yellowArea"
+ },
+ {
+  name:"Blue",
+  emoji:"🔵",
+  cls:"blue-piece",
+  start:39,
+  area:"blueArea"
+ }
 ];
 
-let currentPlayer=0;
+let current=0;
 let dice=0;
 
-/* हर player की 4 गोटियों की position
-   -1 = Home
+/*
+ -1 = Home
+ 0-51 = main track
+ 52-56 = player's final lane
+ 57 = Finish
 */
+
 let pieces=[
-  [-1,-1,-1,-1],
-  [-1,-1,-1,-1],
-  [-1,-1,-1,-1],
-  [-1,-1,-1,-1]
+ [-1,-1,-1,-1],
+ [-1,-1,-1,-1],
+ [-1,-1,-1,-1],
+ [-1,-1,-1,-1]
 ];
 
-/* Basic common path */
+/* =========================
+   52 MAIN PATH
+========================= */
 
 const path=[
-  105,106,107,108,109,110,
-  95,80,65,50,35,20,
-  21,22,23,24,25,26,
-  41,56,71,86,101,116,
-  131,132,133,134,135,136,
-  137,122,107,92,77,62,
-  47,32,17,2,3,4,5,6,
-  7,8,9,10,11,12,
-  27,42,57,72,87,102,
-  117,132,147
+ [6,0],[6,1],[6,2],[6,3],[6,4],
+ [5,5],[4,6],[3,6],[2,6],[1,6],[0,6],
+ [0,7],[0,8],
+ [1,8],[2,8],[3,8],[4,8],[5,9],
+ [6,10],[6,11],[6,12],[6,13],[6,14],
+ [7,14],[8,14],
+ [8,13],[8,12],[8,11],[8,10],[9,9],
+ [10,8],[11,8],[12,8],[13,8],[14,8],
+ [14,7],[14,6],
+ [13,6],[12,6],[11,6],[10,6],[9,5],
+ [8,4],[8,3],[8,2],[8,1],[8,0],
+ [7,0]
 ];
+
+/* Final lanes */
+
+const lanes=[
+ /* Red */
+ [[7,1],[7,2],[7,3],[7,4],[7,5]],
+
+ /* Green */
+ [[1,7],[2,7],[3,7],[4,7],[5,7]],
+
+ /* Yellow */
+ [[7,13],[7,12],[7,11],[7,10],[7,9]],
+
+ /* Blue */
+ [[13,7],[12,7],[11,7],[10,7],[9,7]]
+];
+
+/* Safe positions on main path */
+
+const safe=[0,8,13,21,26,34,39,47];
+
+/* =========================
+   BOARD
+========================= */
+
+const board=document.getElementById("board");
+
+function cellId(r,c){
+ return "cell-"+r+"-"+c;
+}
 
 function createBoard(){
 
-  for(let i=0;i<225;i++){
+ for(let r=0;r<15;r++){
 
-    const cell=document.createElement("div");
+  for(let c=0;c<15;c++){
 
-    cell.className="cell";
+   const cell=document.createElement("div");
 
-    const row=Math.floor(i/15);
-    const col=i%15;
+   cell.className="cell";
+   cell.id=cellId(r,c);
 
-    if(row<6 && col<6)
-      cell.classList.add("red");
+   /* 6x6 homes */
 
-    else if(row<6 && col>8)
-      cell.classList.add("green");
+   if(r<6 && c<6)
+    cell.classList.add("redArea");
 
-    else if(row>8 && col<6)
-      cell.classList.add("blue");
+   else if(r<6 && c>8)
+    cell.classList.add("greenArea");
 
-    else if(row>8 && col>8)
-      cell.classList.add("yellow");
+   else if(r>8 && c>8)
+    cell.classList.add("yellowArea");
 
-    if(row>=6 && row<=8 && col>=6 && col<=8)
-      cell.classList.add("center");
+   else if(r>8 && c<6)
+    cell.classList.add("blueArea");
 
-    cell.id="cell-"+i;
+   /* Main path */
 
-    board.appendChild(cell);
-  }
+   path.forEach((p,i)=>{
 
-  createPieces();
-}
+    if(p[0]===r && p[1]===c){
 
-function createPieces(){
+     cell.classList.add("path");
 
-  players.forEach((player,p)=>{
+     if(safe.includes(i))
+      cell.classList.add("safe");
+    }
 
-    player.home.forEach((homeCell,pieceNumber)=>{
+   });
 
-      const piece=document.createElement("div");
+   /* Final lanes */
 
-      piece.className="piece "+player.color;
+   lanes.forEach((lane,p)=>{
 
-      piece.id="piece-"+p+"-"+pieceNumber;
+    lane.forEach(pos=>{
 
-      piece.onclick=function(){
-        movePiece(p,pieceNumber);
-      };
+     if(pos[0]===r && pos[1]===c){
 
-      document
-        .getElementById("cell-"+homeCell)
-        .appendChild(piece);
+      cell.classList.add(
+       ["redPath","greenPath","yellowPath","bluePath"][p]
+      );
+     }
+
     });
-  });
+
+   });
+
+   /* Center */
+
+   if(r>=6 && r<=8 && c>=6 && c<=8){
+    cell.classList.add("center");
+   }
+
+   board.appendChild(cell);
+  }
+ }
+
+ createHomePieces();
 }
+
+/* =========================
+   HOME PIECES
+========================= */
+
+const homePositions=[
+ [[1,1],[1,4],[4,1],[4,4]],
+ [[1,10],[1,13],[4,10],[4,13]],
+ [[10,10],[10,13],[13,10],[13,13]],
+ [[10,1],[10,4],[13,1],[13,4]]
+];
+
+function createHomePieces(){
+
+ players.forEach((player,p)=>{
+
+  for(let i=0;i<4;i++){
+
+   const piece=document.createElement("div");
+
+   piece.className="piece "+player.cls;
+
+   piece.id="piece-"+p+"-"+i;
+
+   piece.onclick=()=>{
+    movePiece(p,i);
+   };
+
+   const pos=homePositions[p][i];
+
+   document
+    .getElementById(cellId(pos[0],pos[1]))
+    .appendChild(piece);
+  }
+ });
+}
+
+/* =========================
+   MOVE POSITION
+========================= */
+
+function getCoordinate(player,position){
+
+ if(position<0)
+  return null;
+
+ if(position<=51){
+
+  const index=(players[player].start+position)%52;
+
+  return path[index];
+ }
+
+ if(position>=52 && position<=56){
+
+  return lanes[player][position-52];
+ }
+
+ return null;
+}
+
+/* =========================
+   DICE
+========================= */
 
 function rollDice(){
 
-  dice=Math.floor(Math.random()*6)+1;
-
-  const faces=[
-    "",
-    "⚀",
-    "⚁",
-    "⚂",
-    "⚃",
-    "⚄",
-    "⚅"
-  ];
-
-  document.getElementById("dice").textContent=faces[dice];
+ if(dice!==0){
 
   document.getElementById("message").textContent=
-    players[currentPlayer].emoji+
-    " "+players[currentPlayer].name+
-    " को "+dice+" आया। गोटी पर क्लिक करें।";
+   "⚠️ पहले अपनी गोटी चलाएँ।";
+
+  return;
+ }
+
+ dice=Math.floor(Math.random()*6)+1;
+
+ const faces=[
+  "",
+  "⚀","⚁","⚂","⚃","⚄","⚅"
+ ];
+
+ document.getElementById("dice").textContent=
+  faces[dice];
+
+ document.getElementById("message").textContent=
+  players[current].emoji+" "+
+  players[current].name+
+  " को "+dice+" आया। गोटी चुनें।";
 }
 
-function movePiece(playerIndex,pieceNumber){
+/* =========================
+   MOVE PIECE
+========================= */
 
-  if(playerIndex!==currentPlayer){
+function movePiece(p,i){
 
-    document.getElementById("message").textContent=
-      "⚠️ अभी "+players[currentPlayer].name+
-      " Player की बारी है।";
-
-    return;
-  }
-
-  if(dice===0){
-
-    document.getElementById("message").textContent=
-      "🎲 पहले ROLL DICE दबाएँ।";
-
-    return;
-  }
-
-  let position=pieces[playerIndex][pieceNumber];
-
-  /* Home से बाहर */
-
-  if(position===-1){
-
-    if(dice!==6){
-
-      document.getElementById("message").textContent=
-        "❌ गोटी बाहर निकालने के लिए 6 चाहिए।";
-
-      nextPlayer();
-      dice=0;
-      return;
-    }
-
-    position=0;
-
-  }else{
-
-    position+=dice;
-  }
-
-  /* Finish */
-
-  if(position>=path.length){
-
-    position=path.length-1;
-  }
-
-  pieces[playerIndex][pieceNumber]=position;
-
-  const boardPosition=
-    path[position];
-
-  const piece=document.getElementById(
-    "piece-"+playerIndex+"-"+pieceNumber
-  );
-
-  document
-    .getElementById("cell-"+boardPosition)
-    .appendChild(piece);
-
-  updateHomeCount(playerIndex);
+ if(p!==current){
 
   document.getElementById("message").textContent=
-    players[playerIndex].emoji+
-    " "+players[playerIndex].name+
-    " की गोटी चल गई!";
+   "⚠️ अभी "+players[current].name+
+   " Player की बारी है।";
 
-  dice=0;
+  return;
+ }
 
-  if(position===path.length-1){
+ if(dice===0){
 
-    document.getElementById("message").textContent=
-      "🏆 "+players[playerIndex].name+
-      " की गोटी Finish पर पहुँच गई!";
-  }
+  document.getElementById("message").textContent=
+   "🎲 पहले Dice Roll करें।";
+
+  return;
+ }
+
+ let old=pieces[p][i];
+ let next;
+
+ /* Home */
+
+ if(old===-1){
 
   if(dice!==6){
-    nextPlayer();
+
+   document.getElementById("message").textContent=
+    "❌ गोटी बाहर निकालने के लिए 6 चाहिए।";
+
+   nextTurn();
+   return;
   }
-}
 
-function updateHomeCount(playerIndex){
+  next=0;
 
-  let count=0;
+ }else{
 
-  pieces[playerIndex].forEach(pos=>{
-    if(pos===-1) count++;
-  });
+  next=old+dice;
+ }
 
-  const ids=[
-    "redHome",
-    "greenHome",
-    "yellowHome",
-    "blueHome"
-  ];
+ /* Finish limit */
 
-  document.getElementById(ids[playerIndex])
-    .textContent=count;
-}
+ if(next>57){
 
-function nextPlayer(){
+  document.getElementById("message").textContent=
+   "❌ इतनी चाल से गोटी Finish नहीं कर सकती।";
 
-  currentPlayer++;
+  nextTurn();
+  return;
+ }
 
-  if(currentPlayer>=players.length)
-    currentPlayer=0;
+ pieces[p][i]=next;
+
+ renderPiece(p,i);
+
+ /* Capture */
+
+ if(next>=0 && next<=51){
+
+  capture(p,i,next);
+ }
+
+ updateScore();
+
+ /* Winner */
+
+ if(pieces[p].every(x=>x===57)){
+
+  document.getElementById("message").textContent=
+   "🏆 "+players[p].emoji+" "+
+   players[p].name+
+   " PLAYER WINNER! 🎉";
 
   document.getElementById("turn").textContent=
-    players[currentPlayer].emoji+
-    " "+players[currentPlayer].name+
-    " Player की बारी";
+   "🏆 GAME OVER";
+
+  dice=0;
+  return;
+ }
+
+ const rolledSix=(dice===6);
+
+ dice=0;
+
+ if(!rolledSix){
+  nextTurn();
+ }else{
+
+  document.getElementById("message").textContent=
+   "🎉 6 आया! "+players[p].name+
+   " को फिर से मौका।";
+ }
+}
+
+/* =========================
+   RENDER PIECE
+========================= */
+
+function renderPiece(p,i){
+
+ const piece=document.getElementById(
+  "piece-"+p+"-"+i
+ );
+
+ const position=pieces[p][i];
+
+ /* Finish */
+
+ if(position===57){
+
+  document.getElementById("message").textContent=
+   "🏠 गोटी Finish हो गई!";
+
+  return;
+ }
+
+ const pos=getCoordinate(p,position);
+
+ if(!pos) return;
+
+ const cell=document.getElementById(
+  cellId(pos[0],pos[1])
+ );
+
+ cell.appendChild(piece);
+}
+
+/* =========================
+   CAPTURE
+========================= */
+
+function capture(p,i,position){
+
+ const global=(players[p].start+position)%52;
+
+ /* Safe cell पर काटना नहीं */
+
+ if(safe.includes(global))
+  return;
+
+ players.forEach((other)=>{
+
+  const op=players.indexOf(other);
+
+  if(op===p) return;
+
+  pieces[op].forEach((otherPos,oi)=>{
+
+   if(otherPos<0 || otherPos>51)
+    return;
+
+   const otherGlobal=
+    (players[op].start+otherPos)%52;
+
+   if(otherGlobal===global){
+
+    pieces[op][oi]=-1;
+
+    const home=homePositions[op][oi];
+
+    document
+     .getElementById(cellId(home[0],home[1]))
+     .appendChild(
+      document.getElementById(
+       "piece-"+op+"-"+oi
+      )
+     );
+
+    document.getElementById("message").textContent=
+     "💥 "+players[p].name+
+     " ने "+players[op].name+
+     " की गोटी काट दी!";
+   }
+
+  });
+
+ });
+}
+
+/* =========================
+   NEXT TURN
+========================= */
+
+function nextTurn(){
+
+ current++;
+
+ if(current>=4)
+  current=0;
+
+ document.getElementById("turn").textContent=
+  players[current].emoji+" "+
+  players[current].name+
+  " Player की बारी";
+
+ dice=0;
+}
+
+/* =========================
+   SCORE
+========================= */
+
+function updateScore(){
+
+ const ids=["r","g","y","b"];
+
+ players.forEach((p,i)=>{
+
+  let finished=pieces[i].filter(
+   x=>x===57
+  ).length;
+
+  document.getElementById(ids[i]).textContent=
+   finished;
+ });
 }
 
 createBoard();
