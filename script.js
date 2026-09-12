@@ -4,7 +4,12 @@ function searchGames() {
 
   games.forEach(game => {
     const name = game.querySelector("h3").textContent.toLowerCase();
-    game.style.display = name.includes(search) ? "block" : "none";
+
+    if (name.includes(search)) {
+      game.style.display = "block";
+    } else {
+      game.style.display = "none";
+    }
   });
 }
 
@@ -12,13 +17,23 @@ function showCategory(category) {
   const games = document.querySelectorAll(".game");
 
   games.forEach(game => {
-    game.style.display =
-      category === "all" || game.dataset.category === category
-        ? "block"
-        : "none";
+    if (
+      category === "all" ||
+      game.dataset.category === category
+    ) {
+      game.style.display = "block";
+    } else {
+      game.style.display = "none";
+    }
   });
 }
 
 function playGame(gameName) {
-  alert("🎮 " + gameName + " जल्द ही यहाँ playable होगा!");
+
+  if (gameName === "Ludo") {
+    window.location.href = "ludo.html";
+    return;
+  }
+
+  alert("🎮 " + gameName + " जल्द ही playable होगा!");
 }
