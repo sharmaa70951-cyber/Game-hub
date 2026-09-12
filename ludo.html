@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Game Hub - Ludo</title>
 
 <style>
@@ -57,15 +57,14 @@ h1{margin:15px 0 5px}
 }
 
 .piece{
-  width:75%;
-  height:75%;
-  position:absolute;
-  top:12%;
-  left:12%;
+  width:42%;
+  height:42%;
   border-radius:50%;
-  border:3px solid white;
+  position:absolute;
+  border:2px solid white;
   box-shadow:0 2px 5px #333;
   cursor:pointer;
+  z-index:5;
 }
 
 .red-piece{background:#dc2626}
@@ -79,7 +78,7 @@ h1{margin:15px 0 5px}
 
 #dice{
   font-size:55px;
-  margin:10px;
+  margin:8px;
 }
 
 button{
@@ -90,11 +89,30 @@ button{
   color:white;
   font-size:17px;
   font-weight:bold;
+  cursor:pointer;
+}
+
+button:active{
+  transform:scale(.95);
 }
 
 #message{
   margin:12px;
   color:#cbd5e1;
+}
+
+.player-info{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:8px;
+  padding:5px 10px;
+}
+
+.player-info div{
+  padding:7px 12px;
+  border-radius:10px;
+  font-size:13px;
 }
 </style>
 </head>
@@ -105,20 +123,23 @@ button{
 
 <div id="turn">🔴 Red Player की बारी</div>
 
+<div class="player-info">
+  <div>🔴 Red: <span id="redHome">4</span></div>
+  <div>🟢 Green: <span id="greenHome">4</span></div>
+  <div>🟡 Yellow: <span id="yellowHome">4</span></div>
+  <div>🔵 Blue: <span id="blueHome">4</span></div>
+</div>
+
 <div class="board" id="board"></div>
 
 <div class="controls">
-
   <div id="dice">🎲</div>
 
-  <button onclick="rollDice()">
-    ROLL DICE
-  </button>
+  <button onclick="rollDice()">ROLL DICE</button>
 
   <div id="message">
-    पासा फेंकें और अपनी गोटी पर क्लिक करें।
+    पहले पासा फेंकें।
   </div>
-
 </div>
 
 <script>
@@ -126,15 +147,46 @@ button{
 const board=document.getElementById("board");
 
 const players=[
-  {name:"Red",emoji:"🔴",color:"red-piece",start:0},
-  {name:"Green",emoji:"🟢",color:"green-piece",start:13},
-  {name:"Yellow",emoji:"🟡",color:"yellow-piece",start:26},
-  {name:"Blue",emoji:"🔵",color:"blue-piece",start:39}
+  {
+    name:"Red",
+    emoji:"🔴",
+    color:"red-piece",
+    home:[16,17,31,32]
+  },
+  {
+    name:"Green",
+    emoji:"🟢",
+    color:"green-piece",
+    home:[18,19,33,34]
+  },
+  {
+    name:"Yellow",
+    emoji:"🟡",
+    color:"yellow-piece",
+    home:[190,191,205,206]
+  },
+  {
+    name:"Blue",
+    emoji:"🔵",
+    color:"blue-piece",
+    home:[192,193,207,208]
+  }
 ];
 
 let currentPlayer=0;
 let dice=0;
-let positions=[0,0,0,0];
+
+/* हर player की 4 गोटियों की position
+   -1 = Home
+*/
+let pieces=[
+  [-1,-1,-1,-1],
+  [-1,-1,-1,-1],
+  [-1,-1,-1,-1],
+  [-1,-1,-1,-1]
+];
+
+/* Basic common path */
 
 const path=[
   105,106,107,108,109,110,
@@ -144,8 +196,9 @@ const path=[
   131,132,133,134,135,136,
   137,122,107,92,77,62,
   47,32,17,2,3,4,5,6,
-  7,8,9,10,11,12,27,42,57,
-  72,87,102,117,132,147
+  7,8,9,10,11,12,
+  27,42,57,72,87,102,
+  117,132,147
 ];
 
 function createBoard(){
@@ -153,6 +206,7 @@ function createBoard(){
   for(let i=0;i<225;i++){
 
     const cell=document.createElement("div");
+
     cell.className="cell";
 
     const row=Math.floor(i/15);
@@ -178,34 +232,29 @@ function createBoard(){
     board.appendChild(cell);
   }
 
-  addPieces();
+  createPieces();
 }
 
-function addPieces(){
+function createPieces(){
 
-  players.forEach((player,index)=>{
+  players.forEach((player,p)=>{
 
-    const piece=document.createElement("div");
+    player.home.forEach((homeCell,pieceNumber)=>{
 
-    piece.className="piece "+player.color;
+      const piece=document.createElement("div");
 
-    piece.id="piece-"+index;
+      piece.className="piece "+player.color;
 
-    piece.onclick=()=>{
-      movePiece(index);
-    };
+      piece.id="piece-"+p+"-"+pieceNumber;
 
-    const home=[
-      16,
-      23,
-      196,
-      203
-    ];
+      piece.onclick=function(){
+        movePiece(p,pieceNumber);
+      };
 
-    document
-      .getElementById("cell-"+home[index])
-      .appendChild(piece);
-
+      document
+        .getElementById("cell-"+homeCell)
+        .appendChild(piece);
+    });
   });
 }
 
@@ -213,67 +262,124 @@ function rollDice(){
 
   dice=Math.floor(Math.random()*6)+1;
 
-  const faces=["","⚀","⚁","⚂","⚃","⚄","⚅"];
+  const faces=[
+    "",
+    "⚀",
+    "⚁",
+    "⚂",
+    "⚃",
+    "⚄",
+    "⚅"
+  ];
 
   document.getElementById("dice").textContent=faces[dice];
 
   document.getElementById("message").textContent=
     players[currentPlayer].emoji+
     " "+players[currentPlayer].name+
-    " को "+dice+" आया। अपनी गोटी पर क्लिक करें।";
+    " को "+dice+" आया। गोटी पर क्लिक करें।";
 }
 
-function movePiece(playerIndex){
+function movePiece(playerIndex,pieceNumber){
 
   if(playerIndex!==currentPlayer){
+
     document.getElementById("message").textContent=
       "⚠️ अभी "+players[currentPlayer].name+
       " Player की बारी है।";
+
     return;
   }
 
   if(dice===0){
+
     document.getElementById("message").textContent=
-      "पहले 🎲 ROLL DICE दबाएँ।";
+      "🎲 पहले ROLL DICE दबाएँ।";
+
     return;
   }
 
-  positions[playerIndex]+=dice;
+  let position=pieces[playerIndex][pieceNumber];
 
-  if(positions[playerIndex]>=path.length){
-    positions[playerIndex]=path.length-1;
-  }
+  /* Home से बाहर */
 
-  const cellNumber=path[positions[playerIndex]];
+  if(position===-1){
 
-  const piece=document.getElementById(
-    "piece-"+playerIndex
-  );
+    if(dice!==6){
 
-  document
-    .getElementById("cell-"+cellNumber)
-    .appendChild(piece);
+      document.getElementById("message").textContent=
+        "❌ गोटी बाहर निकालने के लिए 6 चाहिए।";
 
-  if(positions[playerIndex]===path.length-1){
+      nextPlayer();
+      dice=0;
+      return;
+    }
 
-    document.getElementById("message").textContent=
-      "🏆 "+players[playerIndex].name+
-      " Player finish के पास पहुँच गया!";
+    position=0;
 
   }else{
 
-    document.getElementById("message").textContent=
-      players[playerIndex].name+
-      " की गोटी "+dice+" कदम चली।";
+    position+=dice;
+  }
 
+  /* Finish */
+
+  if(position>=path.length){
+
+    position=path.length-1;
+  }
+
+  pieces[playerIndex][pieceNumber]=position;
+
+  const boardPosition=
+    path[position];
+
+  const piece=document.getElementById(
+    "piece-"+playerIndex+"-"+pieceNumber
+  );
+
+  document
+    .getElementById("cell-"+boardPosition)
+    .appendChild(piece);
+
+  updateHomeCount(playerIndex);
+
+  document.getElementById("message").textContent=
+    players[playerIndex].emoji+
+    " "+players[playerIndex].name+
+    " की गोटी चल गई!";
+
+  dice=0;
+
+  if(position===path.length-1){
+
+    document.getElementById("message").textContent=
+      "🏆 "+players[playerIndex].name+
+      " की गोटी Finish पर पहुँच गई!";
   }
 
   if(dice!==6){
     nextPlayer();
   }
+}
 
-  dice=0;
+function updateHomeCount(playerIndex){
 
+  let count=0;
+
+  pieces[playerIndex].forEach(pos=>{
+    if(pos===-1) count++;
+  });
+
+  const ids=[
+    "redHome",
+    "greenHome",
+    "yellowHome",
+    "blueHome"
+  ];
+
+  document.getElementById(ids[playerIndex])
+    .textContent=count;
 }
 
 function nextPlayer(){
